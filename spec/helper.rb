@@ -49,7 +49,12 @@ ActiveSupport::Dependencies.autoload_paths << File.dirname(__FILE__)
 ActionMailer::Base.extend(Delayed::DelayMail)
 
 # Used to test interactions between DJ and an ORM
-ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => ':memory:'
+if RUBY_ENGINE == 'jruby'
+  # memory db is not working in jruby
+  ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => 'spec/test.sqlite3'
+else
+  ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => ':memory:'
+end
 ActiveRecord::Base.logger = Delayed::Worker.logger
 ActiveRecord::Migration.verbose = false
 
